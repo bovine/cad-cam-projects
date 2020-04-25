@@ -73,10 +73,10 @@ module print_screw_lips() {
 
         hull() {
             for(side = [ -1 : 2 : 1] ) {            // -1 and +1
-                pos_x = side * (payload_width + 1.5 * counterbore_diameter) / 2;
+                pos_y = side * (payload_width + 1.5 * counterbore_diameter) / 2;
                 
                 for(hole = [ 1 : hole_count] ) {
-                    pos_y = (-0.5 + hole / (hole_count + 1)) * (payload_length + 2 * wall_thickness);
+                    pos_x = (-0.5 + hole / (hole_count + 1)) * (payload_length + 2 * wall_thickness);
                     
                     translate([pos_x, pos_y, 0]) {
                         // extra thickness around the counterbore area
@@ -102,10 +102,10 @@ module print_screwholes() {
     if (hole_count > 0) {
     
         for(side = [ -1 : 2 : 1] ) {            // -1 and +1
-            pos_x = side * (payload_width + 1.5 * counterbore_diameter) / 2;
+            pos_y = side * (payload_width + 1.5 * counterbore_diameter) / 2;
             
             for(hole = [ 1 : hole_count] ) {
-                pos_y = (-0.5 + hole / (hole_count + 1)) * (payload_length + 2 * wall_thickness);
+                pos_x = (-0.5 + hole / (hole_count + 1)) * (payload_length + 2 * wall_thickness);
                 
                 translate([pos_x, pos_y, 0]) {
                     // hole for screw shank
@@ -129,8 +129,8 @@ module print_case_part2() {
     linear_extrude(height = payload_depth + wall_thickness,
         center = false, convexity = 0, twist = 0, scale=1.125) {
         
-        square([payload_width + 2 * wall_thickness, 
-                    payload_length + 2 * wall_thickness], center=true);
+        square([payload_length + 2 * wall_thickness, 
+            payload_width + 2 * wall_thickness], center=true);
     }
     
 }
@@ -140,10 +140,11 @@ module print_case_part1() {
     // TODO: consider also trying chamfered cube?
     // https://github.com/SebiTimeWaster/Chamfers-for-OpenSCAD/blob/master/Chamfer.scad
     
-    translate([-payload_width / 2 - wall_thickness, 
-            -payload_length / 2 - wall_thickness, -(payload_depth+wall_thickness)]) {
-        cube([payload_width + 2 * wall_thickness, 
-                payload_length + 2 * wall_thickness, 
+    translate([-payload_length / 2 - wall_thickness,
+            -payload_width / 2 - wall_thickness,
+            -(payload_depth + wall_thickness)]) {
+        cube([payload_length + 2 * wall_thickness,
+                payload_width + 2 * wall_thickness,
                 payload_depth + wall_thickness]);
     }
     
@@ -151,9 +152,9 @@ module print_case_part1() {
 
 // Volume representing the hollow cavity where the payload will go.
 module print_payload_part() {
-    translate([-payload_width / 2, -payload_length / 2, -payload_depth]) {
+    translate([-payload_length / 2, -payload_width / 2, -payload_depth]) {
         // we make this double-depth so that it fully cuts through the bottom of the object.
-        cube([payload_width, payload_length, payload_depth * 2]);
+        cube([payload_length, payload_width, payload_depth * 2]);
     }
     
 }
