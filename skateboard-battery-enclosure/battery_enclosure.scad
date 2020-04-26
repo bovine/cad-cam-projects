@@ -5,7 +5,7 @@ include <build_plate.scad>
 /* [Walls] */
 
 // What style of body design?
-wall_design = 2;  // [1:Straight-wall box, 2:Tapered-wall box]
+wall_design = 2;  // [1:Straight-wall box, 2:Tapered-wall box, 3:Raked nose+tail]
 
 // How thick should the walls of the enclosure be? (millimeters)
 wall_thickness = 5;    // [1:30]
@@ -88,6 +88,8 @@ module print_part() {
                 print_case_part1();
             } else if (wall_design == 2) {
                 print_case_part2();
+            } else if (wall_design == 3) {
+                print_case_part3();
             }
             print_screw_lips();
         }
@@ -153,7 +155,34 @@ module print_screwholes() {
 }
 
 
-// Case with tapered (drafted) walls
+// Case with tapered (drafted) walls and raked nose+tail.
+module print_case_part3() {
+    nose_angle = 15;            // 0-45, smaller numbers look better.
+    nose_thickness = 2*wall_thickness;
+    
+    translate([0, 0, -(payload_depth+wall_thickness) ])
+    linear_extrude(height = payload_depth + wall_thickness,
+        center = false, convexity = 0, twist = 0, scale=1.125) {
+        
+        polygon(points=[
+            [payload_length / 2, payload_width / 2 + wall_thickness],
+            [payload_length / 2 + nose_thickness, 
+                payload_width / 2 + wall_thickness - nose_thickness / tan(nose_angle)],
+            [payload_length / 2 + nose_thickness,
+                -(payload_width / 2 + wall_thickness - nose_thickness / tan(nose_angle))],
+            [payload_length / 2, -(payload_width / 2 + wall_thickness)],
+            [-payload_length / 2, -(payload_width / 2 + wall_thickness)],
+            [-(payload_length / 2 + nose_thickness),
+                -(payload_width / 2 + wall_thickness - nose_thickness / tan(nose_angle))],
+            [-(payload_length / 2 + nose_thickness), 
+                payload_width / 2 + nose_thickness - nose_thickness / tan(nose_angle)],
+            [-payload_length / 2, payload_width / 2 + wall_thickness]
+            ]);
+    }
+}
+
+
+// Case with tapered (drafted) walls.
 module print_case_part2() {
     translate([0, 0, -(payload_depth+wall_thickness) ])
     linear_extrude(height = payload_depth + wall_thickness,
@@ -162,14 +191,10 @@ module print_case_part2() {
         square([payload_length + 2 * wall_thickness, 
             payload_width + 2 * wall_thickness], center=true);
     }
-    
 }
 
 // Case with straight walls
 module print_case_part1() {
-    // TODO: consider also trying chamfered cube?
-    // https://github.com/SebiTimeWaster/Chamfers-for-OpenSCAD/blob/master/Chamfer.scad
-    
     translate([-payload_length / 2 - wall_thickness,
             -payload_width / 2 - wall_thickness,
             -(payload_depth + wall_thickness)]) {
@@ -177,7 +202,6 @@ module print_case_part1() {
                 payload_width + 2 * wall_thickness,
                 payload_depth + wall_thickness]);
     }
-    
 }
 
 // Volume representing the hollow cavity where the payload will go.
