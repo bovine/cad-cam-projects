@@ -4,6 +4,9 @@ include <build_plate.scad>
 
 /* [Walls] */
 
+// What style of body design?
+wall_design = 2;  // [1:Straight-wall box, 2:Tapered-wall box]
+
 // How thick should the walls of the enclosure be? (millimeters)
 wall_thickness = 5;    // [1:30]
 
@@ -37,6 +40,11 @@ screw_lip_width = 10; // [0:50]
 screw_lip_thickness = 4;
 
 
+/* [Oversized splitting] */
+//when your printer bed is too small to fit the entire model.
+split_half = 0;  //[0:No splitting,1:Half (1 of 2),2:Half (2 of 2)]
+
+
 /* [Build plate] */
 //for display only, doesn't contribute to final object
 build_plate_selector = 0; //[0:Replicator 2,1: Replicator,2:Thingomatic,3:Manual]
@@ -51,14 +59,36 @@ build_plate(build_plate_selector,build_plate_manual_x,build_plate_manual_y);
  
 
 
-
-print_part();
+if (split_half == 0) {
+    // print the whole part.
+    print_part();
+} else if (split_half == 1) {
+    // split in half, print part 1 of 2
+    rotate([0, 0, 90])
+    translate([-payload_length/4, 0, 0])
+    intersection() {
+        translate([0, -500, -500]) cube(1000, 1000, 1000);
+        print_part();
+    }
+} else if (split_half == 2) {
+    // split in half, print part 2 of 2
+    rotate([0, 0, 90])
+    translate([payload_length/4, 0, 0])
+    intersection() {
+        translate([-1000, -500, -500]) cube(1000, 1000, 1000);
+        print_part();
+    }
+}
 
 module print_part() {
     difference() {
         // this is the actual solid parts of the model.
         union() {
-            print_case_part2();
+            if (wall_design == 1) {
+                print_case_part1();
+            } else if (wall_design == 2) {
+                print_case_part2();
+            }
             print_screw_lips();
         }
         
