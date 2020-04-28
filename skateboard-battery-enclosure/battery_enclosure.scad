@@ -126,7 +126,7 @@ module print_passthrus() {
 
 
 module print_screw_lips() {
-    if (hole_count > 0 && screw_lip_width > 0) {
+    if (wall_design == 1 && hole_count > 0 && screw_lip_width > 0) {
 
         hull() {
             for(side = [ -1 : 2 : 1] ) {            // -1 and +1
