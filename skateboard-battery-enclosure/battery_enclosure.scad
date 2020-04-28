@@ -33,11 +33,20 @@ hole_diameter = 3;
 // What diameter of screw head should be allowed? (millimeters)
 counterbore_diameter = 8;
 
-// How wide should the radius around the screw holes should the flange lip be? 0 will disable (millimeters)
+// How wide should the radius around the screw holes should the flange lip be? 0 will disable (millimeters) (for "Straight-wall box" design only)
 screw_lip_width = 10; // [0:50]
 
-// How thick should the flange lip be? (millimeters)
+// How thick should the flange lip be? (millimeters) (for "Straight-wall box" design only)
 screw_lip_thickness = 4;
+
+
+/* [Bulkhead wire passthru cutouts] */
+
+// How many wire passthru cutout holes should be made in the rear side? 0 will disable holes.
+passthru_count = 1;      // [0:4]
+
+// What diameter passthru cutout holes should be made, if enabled (millimeters)
+passthru_diameter = 10;  // [1:50]
 
 
 /* [Oversized splitting] */
@@ -93,12 +102,28 @@ module print_part() {
             }
             print_screw_lips();
         }
-        
+
         // everything below is subtracted from the above parts.
         print_payload_part();
         print_screwholes();
+        print_passthrus();
     }
 }
+
+
+module print_passthrus() {
+    if (passthru_count > 0) {
+        for(hole = [ 1 : passthru_count] ) {
+            pos_y = (-0.5 + hole / (passthru_count + 1)) *
+                (payload_width + 2 * wall_thickness);
+
+            translate([(payload_length / 4), pos_y, -(payload_depth / 2)])
+            rotate([0, 90, 0])
+            polyhole(h = payload_length / 2, d = passthru_diameter);
+        }
+    }
+}
+
 
 module print_screw_lips() {
     if (hole_count > 0 && screw_lip_width > 0) {
@@ -106,21 +131,23 @@ module print_screw_lips() {
         hull() {
             for(side = [ -1 : 2 : 1] ) {            // -1 and +1
                 pos_y = side * (payload_width + 1.5 * counterbore_diameter) / 2;
-                
+
                 for(hole = [ 1 : hole_count] ) {
-                    pos_x = (-0.5 + hole / (hole_count + 1)) * (payload_length + 2 * wall_thickness);
-                    
+                    pos_x = (-0.5 + hole / (hole_count + 1)) * 
+                        (payload_length + 2 * wall_thickness);
+
                     translate([pos_x, pos_y, 0]) {
                         // extra thickness around the counterbore area
                         //translate([0, 0, -(payload_depth * 2)])
                         //polyhole(h = payload_depth * 2, d = 2 * counterbore_diameter);
-                        
+
                         // lip around the base of one mounting screw
                         translate([0, 0, -screw_lip_thickness])
-                        cylinder(h = screw_lip_thickness, d = 2 * screw_lip_width);
+                        cylinder(h = screw_lip_thickness, 
+                                d = 2 * screw_lip_width);
                     }
                 }
-            }        
+            }
         }
     }
 }
@@ -210,5 +237,4 @@ module print_payload_part() {
         // we make this double-depth so that it fully cuts through the bottom of the object.
         cube([payload_length, payload_width, payload_depth * 2]);
     }
-    
 }
