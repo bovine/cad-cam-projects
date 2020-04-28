@@ -5,7 +5,7 @@ include <build_plate.scad>
 /* [Walls] */
 
 // What style of body design?
-wall_design = 2;  // [1:Straight-wall box, 2:Tapered-wall box, 3:Raked nose+tail]
+wall_design = 3;  // [1:A=Straight-wall box, 2:B=Tapered-wall box, 3:C=Raked nose+tail]
 
 // How thick should the walls of the enclosure be? (millimeters)
 wall_thickness = 5;    // [1:30]
@@ -24,8 +24,8 @@ payload_depth = 20;
 
 /* [Screw holes] */
 
-// How many holes should there be on each side of the enclosure? 0 will disable holes.
-hole_count = 3;     // [0:5]
+// How many holes should there be on each side of the enclosure? 0 will disable holes. (recommend even number if using oversized splitting)
+hole_count = 4;     // [0:5]
 
 // What diameter screw hole should be made? (millimeters)
 hole_diameter = 3;
@@ -33,10 +33,10 @@ hole_diameter = 3;
 // What diameter of screw head should be allowed? (millimeters)
 counterbore_diameter = 8;
 
-// How wide should the radius around the screw holes should the flange lip be? 0 will disable (millimeters) (for "Straight-wall box" design only)
+// How wide should the radius around the screw holes should the flange lip be? 0 will disable (millimeters) (for body design A only)
 screw_lip_width = 10; // [0:50]
 
-// How thick should the flange lip be? (millimeters) (for "Straight-wall box" design only)
+// How thick should the flange lip be? (millimeters) (for body design A only)
 screw_lip_thickness = 4;
 
 
@@ -94,11 +94,11 @@ module print_part() {
         // this is the actual solid parts of the model.
         union() {
             if (wall_design == 1) {
-                print_case_part1();
+                print_case_part_a();
             } else if (wall_design == 2) {
-                print_case_part2();
+                print_case_part_b();
             } else if (wall_design == 3) {
-                print_case_part3();
+                print_case_part_c();
             }
             print_screw_lips();
         }
@@ -182,8 +182,8 @@ module print_screwholes() {
 }
 
 
-// Case with tapered (drafted) walls and raked nose+tail.
-module print_case_part3() {
+// Case C with tapered (drafted) walls and raked nose+tail.
+module print_case_part_c() {
     nose_angle = 15;            // 0-45, smaller numbers look better.
     nose_thickness = 2*wall_thickness;
     
@@ -209,8 +209,8 @@ module print_case_part3() {
 }
 
 
-// Case with tapered (drafted) walls.
-module print_case_part2() {
+// Case B with tapered (drafted) walls.
+module print_case_part_b() {
     translate([0, 0, -(payload_depth+wall_thickness) ])
     linear_extrude(height = payload_depth + wall_thickness,
         center = false, convexity = 0, twist = 0, scale=1.125) {
@@ -220,8 +220,8 @@ module print_case_part2() {
     }
 }
 
-// Case with straight walls
-module print_case_part1() {
+// Case A with straight walls
+module print_case_part_a() {
     translate([-payload_length / 2 - wall_thickness,
             -payload_width / 2 - wall_thickness,
             -(payload_depth + wall_thickness)]) {
