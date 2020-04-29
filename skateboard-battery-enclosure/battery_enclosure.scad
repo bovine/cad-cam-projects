@@ -76,7 +76,7 @@ if (split_half == 0) {
     rotate([0, 0, 90])
     translate([-payload_length/4, 0, 0])
     intersection() {
-        translate([0, -500, -500]) cube(1000, 1000, 1000);
+        translate([0, -500, -500]) cube([1000, 1000, 1000]);
         print_part();
     }
 } else if (split_half == 2) {
@@ -84,7 +84,7 @@ if (split_half == 0) {
     rotate([0, 0, 90])
     translate([payload_length/4, 0, 0])
     intersection() {
-        translate([-1000, -500, -500]) cube(1000, 1000, 1000);
+        translate([-1000, -500, -500]) cube([1000, 1000, 1000]);
         print_part();
     }
 }
