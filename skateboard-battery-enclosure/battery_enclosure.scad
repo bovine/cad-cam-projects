@@ -45,8 +45,11 @@ screw_lip_thickness = 4;
 // How many wire passthru cutout holes should be made in the rear side? 0 will disable holes.
 passthru_count = 1;      // [0:4]
 
-// What diameter passthru cutout holes should be made, if enabled (millimeters)
-passthru_diameter = 10;  // [1:50]
+// What diameter width passthru cutout holes should be made, if enabled (millimeters). Set diameter width to diameter height for a circular cutout.
+passthru_diameter_width = 20;  // [1:50]
+
+// What diameter height passthru cutout holes should be made, if enabled (millimeters). Set diameter width to diameter height for a circular cutout.
+passthru_diameter_height = 10;  // [1:50]
 
 
 /* [Oversized splitting] */
@@ -119,7 +122,8 @@ module print_passthrus() {
 
             translate([(payload_length / 4), pos_y, -(payload_depth / 2)])
             rotate([0, 90, 0])
-            polyhole(h = payload_length / 2, d = passthru_diameter);
+            scale([passthru_diameter_height / passthru_diameter_width, 1, 1])
+            polyhole(h = payload_length / 2, d = passthru_diameter_width);
         }
     }
 }
